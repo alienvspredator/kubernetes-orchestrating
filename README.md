@@ -1,4 +1,4 @@
-# Lab 4
+# Lab 4-5
 
 This is a Vagrant's pre-configured VM with a completed exercise for the fourth lab.
 This example shows how to create a Kubernetes cluster.
@@ -97,6 +97,184 @@ This example shows how to create a Kubernetes cluster.
 
     Request Body:
         -no body in request-
+    ```
+
+11. View application logs
+
+    ```sh
+    $ kubectl logs hello-minikube-5d9b964bfb-wnbzk
+    Generating self-signed cert
+    Generating a 2048 bit RSA private key
+    ............................................................................................+++
+    ...........................................+++
+    writing new private key to '/certs/privateKey.key'
+    -----
+    Starting nginx
+    ```
+
+12. Describe the service
+
+    ```sh
+    $ kubectl describe services/hello-minikube
+    Name:                     hello-minikube
+    Namespace:                default
+    Labels:                   app=hello-minikube
+    Annotations:              <none>
+    Selector:                 app=hello-minikube
+    Type:                     NodePort
+    IP:                       10.105.210.58
+    Port:                     <unset>  8080/TCP
+    TargetPort:               8080/TCP
+    NodePort:                 <unset>  32442/TCP
+    Endpoints:                172.18.0.3:8080
+    Session Affinity:         None
+    External Traffic Policy:  Cluster
+    Events:                   <none>
+    ```
+
+13. Describe the deployments
+
+    ```sh
+    $ kubectl describe deployments.apps
+    Name:                   hello-minikube
+    Namespace:              default
+    CreationTimestamp:      Mon, 21 Sep 2020 14:22:35 +0000
+    Labels:                 app=hello-minikube
+    Annotations:            deployment.kubernetes.io/revision: 1
+    Selector:               app=hello-minikube
+    Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+    StrategyType:           RollingUpdate
+    MinReadySeconds:        0
+    RollingUpdateStrategy:  25% max unavailable, 25% max surge
+    Pod Template:
+      Labels:  app=hello-minikube
+      Containers:
+       echoserver:
+        Image:        k8s.gcr.io/echoserver:1.10
+        Port:         <none>
+        Host Port:    <none>
+        Environment:  <none>
+        Mounts:       <none>
+      Volumes:        <none>
+    Conditions:
+      Type           Status  Reason
+      ----           ------  ------
+      Progressing    True    NewReplicaSetAvailable
+      Available      True    MinimumReplicasAvailable
+    OldReplicaSets:  <none>
+    NewReplicaSet:   hello-minikube-5d9b964bfb (1/1 replicas created)
+    Events:          <none>
+    ```
+
+    It's running with label app=hello-minikube
+
+14. Apply filters to the pods and the services
+
+    ```sh
+    $ kubectl get pods -l app=hello-minikube
+    NAME                              READY   STATUS    RESTARTS   AGE
+    hello-minikube-5d9b964bfb-wnbzk   1/1     Running   1          5d2h
+    ```
+
+    ```sh
+    $ kubectl get service -l app=hello-minikube
+    NAME             TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+    hello-minikube   NodePort   10.105.210.58   <none>        8080:32442/TCP   5d3h
+    ```
+
+15. Lable the pod
+
+    ```sh
+    $ kubectl label pod hello-minikube-5d9b964bfb-wnbzk version=v1
+    pod/hello-minikube-5d9b964bfb-wnbzk labeled
+    ```
+
+16. Delete the service
+
+    ```sh
+    $ kubectl delete service -l app=hello-minikube
+    service "hello-minikube" deleted
+    ```
+
+## Application scaling
+
+1. Scale up the deployment to 4 replicas
+
+    ```sh
+    $ kubectl scale deployment --replicas 4 hello-minikube
+    deployment.apps/hello-minikube scaled
+    $ kubectl get deployments.apps
+    NAME             READY   UP-TO-DATE   AVAILABLE   AGE
+    hello-minikube   4/4     4            4           5d3h
+    ```
+
+2. Check the number of pods changed
+
+    ```sh
+    $ kubectl get pods -o wide
+    NAME                              READY   STATUS    RESTARTS   AGE    IP           NODE       NOMINATED NODE   READINESS GATES
+    hello-minikube-5d9b964bfb-dslvk   1/1     Running   0          69s    172.18.0.6   minikube   <none>           <none>
+    hello-minikube-5d9b964bfb-gltrc   1/1     Running   0          69s    172.18.0.7   minikube   <none>           <none>
+    hello-minikube-5d9b964bfb-wnbzk   1/1     Running   1          5d3h   172.18.0.3   minikube   <none>           <none>
+    hello-minikube-5d9b964bfb-xwfdb   1/1     Running   0          69s    172.18.0.8   minikube   <none>           <none>
+    ```
+
+3. Check that the service is load-balancing the traffic
+
+    Make multiple http request to the service
+
+    ```sh
+    $ curl -L $(minikube service hello-minikube --url)
+    Hostname: hello-minikube-5d9b964bfb-xwfdb
+    ...
+    $ curl -L $(minikube service hello-minikube --url)
+    Hostname: hello-minikube-5d9b964bfb-wnbzk
+    ...
+    ```
+
+## Update a container version
+
+1. Verify the application version
+
+    ```sh
+    $ kubectl describe pods
+    Name:         hello-minikube-5d9b964bfb-dslvk
+    ...
+    Labels:       app=hello-minikube
+    ...
+    Containers:
+    echoserver:
+        ...
+        Image:          k8s.gcr.io/echoserver:1.10
+    ```
+
+2. Update the version
+
+    ```sh
+    $ kubectl set image deployments hello-minikube echoserver=k8s.gcr.io/echoserver:1.9
+    deployment.apps/hello-minikube image updated
+    ```
+
+3. List the pods
+
+    ```sh
+    $ kubectl get pods
+    NAME                              READY   STATUS        RESTARTS   AGE
+    hello-minikube-5d9b964bfb-dslvk   1/1     Terminating   0          18m
+    hello-minikube-5d9b964bfb-gltrc   1/1     Terminating   0          18m
+    hello-minikube-5d9b964bfb-wnbzk   1/1     Terminating   1          5d3h
+    hello-minikube-5d9b964bfb-xwfdb   1/1     Terminating   0          18m
+    hello-minikube-6b75f66798-9tnsc   1/1     Running       0          25s
+    hello-minikube-6b75f66798-jqx6c   1/1     Running       0          21s
+    hello-minikube-6b75f66798-q6gbb   1/1     Running       0          26s
+    hello-minikube-6b75f66798-wvcpn   1/1     Running       0          22s
+    ```
+
+4. Rollout an update
+
+    ```sh
+    $ kubectl rollout status deployment hello-minikube
+    deployment "hello-minikube" successfully rolled out
     ```
 
 ## Log in to dashboard
