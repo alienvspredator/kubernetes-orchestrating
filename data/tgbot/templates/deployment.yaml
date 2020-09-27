@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tgbot.fullname" . }}
+  labels:
+    {{- include "tgbot.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "tgbot.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "tgbot.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "tgbot.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.tgbot.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.tgbot.pullPolicy }}
+          env:
+            - name: TG_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: tg_token
+                  name: {{ .Release.Name }}-auth
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: db_name
+                  name: {{ .Release.Name }}-auth
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: db_user
+                  name: {{ .Release.Name }}-auth
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: db_host
+                  name: {{ .Release.Name }}-auth
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: db_port
+                  name: {{ .Release.Name }}-auth
+            - name: DB_SSLMODE
+              valueFrom:
+                secretKeyRef:
+                  key: db_sslmode
+                  name: {{ .Release.Name }}-auth
+            - name: SECRET_MANAGER
+              valueFrom:
+                secretKeyRef:
+                  key: secret_manager
+                  name: {{ .Release.Name }}-auth
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

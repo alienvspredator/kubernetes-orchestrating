@@ -62,7 +62,7 @@ sudo mkdir -p /opt/cni/bin
 sudo tar -C /opt/cni/bin -xzf cni-plugins.tgz
 rm cni-plugins.tgz
 
-echo "Installing Minikube and kubectl..."
+echo "Installing Helm, Minikube and kubectl..."
 grep -E --color 'vmx|svm' /proc/cpuinfo
 sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -74,6 +74,7 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
 sudo mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 rm minikube
+curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 # dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/aio/deploy/recommended.yaml
@@ -82,10 +83,11 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/a
 (
 	cat <<-EOF
 
-		# kubernetes completion
+		# kubernetes and helm completion
 		source <(kubectl completion zsh)
 		source <(minikube completion zsh)
 		source <(kubeadm completion zsh)
+		source <(helm completion zsh)
 	EOF
 ) | tee -a ~/.zshrc
 

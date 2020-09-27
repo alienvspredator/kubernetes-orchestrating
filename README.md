@@ -1,4 +1,4 @@
-# Lab 4-5
+# Lab 4-6
 
 This is a Vagrant's pre-configured VM with a completed exercise for the fourth lab.
 This example shows how to create a Kubernetes cluster.
@@ -320,3 +320,99 @@ This example shows how to create a Kubernetes cluster.
 
 4. [Open](http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/) `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/` with your browser.
 5. Sign in using the token obtained in the previous step.
+
+## Helm
+
+1. Navigate to the data directory with the following command: `cd data`.
+
+2. Install [cockroachdb](https://www.cockroachlabs.com/docs/v20.1/orchestrate-a-local-cluster-with-kubernetes-insecure)
+
+    ```sh
+    $ helm repo add cockroachdb https://charts.cockroachdb.com/
+    "cockroachdb" has been added to your repositories
+
+    $ helm repo update
+    Hang tight while we grab the latest from your chart repositories...
+    ...Successfully got an update from the "cockroachdb" chart repository
+    Update Complete. ⎈Happy Helming!⎈
+
+    $ helm install cockroachdb cockroachdb/cockroachd
+    NAME: cockroachdb
+    LAST DEPLOYED: Sat Sep 26 21:33:38 2020
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    NOTES:
+    CockroachDB can be accessed via port 26257 at the
+    following DNS name from within your cluster:
+
+    cockroachdb-public.default.svc.cluster.local
+
+    Because CockroachDB supports the PostgreSQL wire protocol, you can connect to
+    the cluster using any available PostgreSQL client.
+
+    For example, you can open up a SQL shell to the cluster by running:
+
+        kubectl run -it --rm cockroach-client \
+            --image=cockroachdb/cockroach \
+            --restart=Never \
+            --command -- \
+            ./cockroach sql --insecure --host=cockroachdb-public.default
+
+    From there, you can interact with the SQL shell as you would any other SQL
+    shell, confident that any data you write will be safe and available even if
+    parts of your cluster fail.
+
+    Finally, to open up the CockroachDB admin UI, you can port-forward from your
+    local machine into one of the instances in the cluster:
+
+        kubectl port-forward cockroachdb-0 8080
+
+    Then you can access the admin UI at http://localhost:8080/ in your web browser.
+
+    For more information on using CockroachDB, please see the project's docs at:
+    https://www.cockroachlabs.com/docs/
+    ```
+
+3. Forward ports for the Admin UI and a DB connection
+
+    ```sh
+    $ kubectl port-forward cockroachdb-0 8080 26257 --address 0.0.0.0
+    Forwarding from 0.0.0.0:8080 -> 8080
+    Forwarding from 0.0.0.0:26257 -> 26257
+    ```
+
+4. (Optional) Scale the cockroach StatefulSet
+
+    ```sh
+    $ kubectl scale statefulset --replicas 4 cockroachdb
+    statefulset.apps/cockroachdb scale
+    ```
+
+5. Generate the values for Telegram Bot App:
+
+    ```sh
+    $ TG_TOKEN=YOUR_TELEGRAM_BOT_TOKEN ./gen-values.sh
+    env:
+      tg_token: YOUR_TELEGRAM_BOT_TOKEN
+      db_name: defaultdb
+      db_user: root
+      db_host: cockroachdb-0.cockroachdb
+      db_port: "26257"
+      db_sslmode: disable
+      secret_manager: IN_MEMORY
+    ```
+
+    Where `YOUR_TELEGRAM_BOT_TOKEN` is the bot token.
+
+6. Install the bot with the helm
+
+    ```sh
+    $ helm install tgbot --values tgbot-values.yaml ./tgbot
+    NAME: tgbot
+    LAST DEPLOYED: Sun Sep 27 12:45:01 2020
+    NAMESPACE: default
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
+    ```
