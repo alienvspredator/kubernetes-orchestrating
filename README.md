@@ -336,7 +336,7 @@ This example shows how to create a Kubernetes cluster.
     ...Successfully got an update from the "cockroachdb" chart repository
     Update Complete. ⎈Happy Helming!⎈
 
-    $ helm install cockroachdb cockroachdb/cockroachd
+    $ helm install cockroachdb cockroachdb/cockroachdb
     NAME: cockroachdb
     LAST DEPLOYED: Sat Sep 26 21:33:38 2020
     NAMESPACE: default
