@@ -29,6 +29,8 @@ sudo service docker restart
 # Make sure we can actually use docker as the vagrant user
 sudo usermod -aG docker vagrant
 sudo docker --version
+sudo curl -sSL "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 
 for bin in cfssl cfssl-certinfo cfssljson; do
 	echo "Installing $bin..."
@@ -75,6 +77,8 @@ sudo mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 rm minikube
 curl -sSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo update
 
 # dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/aio/deploy/recommended.yaml
@@ -94,4 +98,4 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.4/a
 sudo snap install microk8s --classic
 
 # OMZ plugins
-sed -i 's/plugins=(git)/plugins=(debian git kubectl minikube microk8s)/g' ~/.zshrc
+sed -i 's/plugins=(git)/plugins=(ubuntu git kubectl minikube microk8s docker-compose docker)/g' ~/.zshrc

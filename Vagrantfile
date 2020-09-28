@@ -25,11 +25,39 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder './data', '/home/vagrant/data'
 
   # Cockroachdb
-  config.vm.network 'forwarded_port', guest: 26_257, host: 26_257, auto_correct: true, host_ip: '127.0.0.1'
-  config.vm.network 'forwarded_port', guest: 8080, host: 8080, auto_correct: true, host_ip: '127.0.0.1'
+  config.vm.network 'forwarded_port', {
+    id: 'cockroach grpc',
+    guest: 26_257,
+    host: 26_257,
+    auto_correct: true,
+    host_ip: '127.0.0.1'
+  }
+  config.vm.network 'forwarded_port', {
+    id: 'cockroach web-ui',
+    guest: 8080,
+    host: 8080,
+    auto_correct: true,
+    host_ip: '127.0.0.1'
+  }
+
+  # ElasticSearch stack
+  # Kibana
+  config.vm.network 'forwarded_port', {
+    id: 'kibana',
+    guest: 5601,
+    host: 5601,
+    auto_correct: true,
+    host_ip: '127.0.0.1'
+  }
 
   # kubectl proxy (for kubectl proxy --address 0.0.0.0 --disable-filter --port 8001)
-  config.vm.network 'forwarded_port', guest: 8001, host: 8001, auto_correct: true, host_ip: '127.0.0.1'
+  config.vm.network 'forwarded_port', {
+    id: 'kubectl proxy',
+    guest: 8001,
+    host: 8001,
+    auto_correct: true,
+    host_ip: '127.0.0.1'
+  }
 
   vm_config = VmConfig.new name: 'kubernetes', cpus: 2, memory: 4096
 
