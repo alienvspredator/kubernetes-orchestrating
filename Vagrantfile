@@ -59,7 +59,7 @@ Vagrant.configure(2) do |config|
     host_ip: '127.0.0.1'
   }
 
-  vm_config = VmConfig.new name: 'kubernetes', cpus: 2, memory: 4096
+  vm_config = VmConfig.new name: 'kubernetes', cpus: 4, memory: 1024 * 8
 
   # Increase memory for Parallels Desktop
   config.vm.provider 'parallels' do |p, _o|

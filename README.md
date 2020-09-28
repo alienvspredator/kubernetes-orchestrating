@@ -416,3 +416,20 @@ This example shows how to create a Kubernetes cluster.
     REVISION: 1
     TEST SUITE: None
     ```
+
+## Elastic Stack
+
+### Setup
+
+```sh
+cd ~/data/elastic-stack
+helm install --values values.yaml elasticsearch elastic/elasticsearch
+helm install kibana elastic/kibana
+kubectl create -f fluentd-daemonset-elasticsearch.yaml
+```
+
+### Delete
+
+```sh
+kubectl delete daemonsets.apps -n kube-system fluentd
+```
