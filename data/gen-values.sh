@@ -11,7 +11,7 @@ VALUES=$(
 		  tg_token: ${TG_TOKEN}
 		  db_name: defaultdb
 		  db_user: root
-		  db_host: cockroachdb
+		  db_host: cockroachdb-public
 		  db_port: '26257'
 		  db_sslmode: disable
 		  secret_manager: IN_MEMORY

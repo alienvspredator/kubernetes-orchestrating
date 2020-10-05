@@ -423,6 +423,7 @@ This example shows how to create a Kubernetes cluster.
 
 ```sh
 cd ~/data
+minikube start
 helm repo add fluent https://fluent.github.io/helm-charts
 helm repo add elastic https://helm.elastic.co
 helm repo add cockroachdb https://charts.cockroachdb.com/
@@ -433,4 +434,28 @@ helm install cockroachdb cockroachdb/cockroachdb
 ENABLE_FLUENT=1 TG_TOKEN=YOUR_TELEGRAM_BOT_TOKEN ./gen-values.sh
 helm install --values tgbot-values.yaml tgbot ./tgbot
 kubectl port-forward kibana-kibana-696f869668-fbcgk 5601 --address 0.0.0.0
+```
+
+## Metrics
+
+### Setup
+
+```sh
+cd ~/data
+minikube start
+helm repo add cockroachdb https://charts.cockroachdb.com/
+helm install cockroachdb cockroachdb/cockroachdb
+ENABLE_PROMETHEUS=1 TG_TOKEN=YOUR_TELEGRAM_BOT_TOKEN ./gen-values.sh
+helm install --values tgbot-values.yaml tgbot ./tgbot
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm install --values metrics/prometheus-values.yaml prometheus prometheus-community/prometheus
+
+helm repo add grafana https://grafana.github.io/helm-charts
+helm install --values metrics/grafana-values.yaml grafana grafana/grafana
+kubectl get secret --namespace default grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace default port-forward $POD_NAME 3000 --address 0.0.0.0
+
+# rate(server_failed_reply_count{job="tgbot"}[5m]) / rate(server_incoming_messages_count{job="tgbot"}[5m])
 ```

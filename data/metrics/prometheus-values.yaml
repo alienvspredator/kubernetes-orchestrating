@@ -1,0 +1,29 @@
+extraScrapeConfigs: |
+  - job_name: 'tgbot'
+    scrape_interval: 5s
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['tgbot-metrics:9090']
+# serverFiles:
+#   prometheus.yml:
+#     rule_files:
+#       - /etc/config/recording_rules.yml
+#       - /etc/config/alerting_rules.yml
+
+#     global:
+#       scrape_interval: 15s # By default, scrape targets every 15 seconds.
+
+#       external_labels:
+#         monitor: 'codelab-monitor'
+
+#     scrape_configs:
+#       - job_name: 'prometheus'
+#         scrape_interval: 5s
+#         static_configs:
+#           - targets: ['localhost:9090']
+
+#       - job_name: 'tgbot'
+#         scrape_interval: 5s
+#         metrics_path: /metrics
+#         static_configs:
+#           - targets: ['tgbot-metrics:9090']
