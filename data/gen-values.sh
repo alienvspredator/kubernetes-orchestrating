@@ -18,23 +18,25 @@ VALUES=$(
 	EOF
 )
 
+FLUENT_HOST="''"
+
 if [ -n "${ENABLE_FLUENT}" ]; then
-	VALUES=$(
-		cat <<-EOF
-			${VALUES}
-			  fluent_host: fluentd
-			  fluent_port: '24231'
-		EOF
-	)
+	FLUENT_HOST=fluentd
 fi
 
+OBSERVABILITY_EXPORTER="''"
+
 if [ -n "${ENABLE_PROMETHEUS}" ]; then
-	VALUES=$(
-		cat <<-EOF
-			${VALUES}
-			  prometheus_port: '9090'
-		EOF
-	)
+	OBSERVABILITY_EXPORTER=PROMETHEUS
 fi
+
+VALUES=$(
+	cat <<-EOF
+		${VALUES}
+		  fluent_host: $FLUENT_HOST
+		  fluent_port: '24231'
+		  observability_exporter: $OBSERVABILITY_EXPORTER
+	EOF
+)
 
 echo $VALUES | tee ~/data/tgbot-values.yaml

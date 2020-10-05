@@ -59,6 +59,14 @@ Vagrant.configure(2) do |config|
     host_ip: '127.0.0.1'
   }
 
+  config.vm.network 'forwarded_port', {
+    id: 'tgbot metrics',
+    guest: 9090,
+    host: 9090,
+    auto_correct: true,
+    host_ip: '127.0.0.1'
+  }
+
   vm_config = VmConfig.new name: 'kubernetes', cpus: 4, memory: 1024 * 8
 
   # Increase memory for Parallels Desktop

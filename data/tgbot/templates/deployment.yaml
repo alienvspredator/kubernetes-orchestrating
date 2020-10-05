@@ -77,6 +77,10 @@ spec:
                 secretKeyRef:
                   key: fluent_port
                   name: {{ .Release.Name }}-auth
+            - name: OBSERVABILITY_EXPORTER
+              value: {{ .Values.env.observability_exporter }}
+            - name: METRICS_PORT
+              value: {{ .Values.service.ports.metrics.port | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

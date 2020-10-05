@@ -10,7 +10,7 @@ image:
     repository: danyloshevchenko123/tgbot
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.1.0
+  tag: v1.2.0
 
 imagePullSecrets: []
 nameOverride: ''
@@ -59,6 +59,18 @@ tolerations: []
 
 affinity: {}
 
+service:
+  ports:
+    metrics:
+      port: 9090
+      name: metrics
+
+  metrics:
+    type: ClusterIP
+    labels:
+      app.kubernetes.io/component: tgbot
+    annotations: {}
+
 env:
   tg_token: ''
   db_name: defaultdb
@@ -67,5 +79,6 @@ env:
   db_port: '26257'
   db_sslmode: disable
   secret_manager: IN_MEMORY
-  fluent_host: fluentd
+  fluent_host: ''
   fluent_port: '24224'
+  observability_exporter:
