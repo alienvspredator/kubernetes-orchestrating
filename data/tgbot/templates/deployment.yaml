@@ -33,7 +33,11 @@ spec:
           imagePullPolicy: {{ .Values.image.tgbot.pullPolicy }}
           ports:
             - name: metrics
+              {{- if eq .Values.service.ports.metrics.port "" }}
               containerPort: 9090
+              {{- else }}
+              containerPort: {{ .Values.service.ports.metrics.port }}
+              {{- end }}
           env:
             - name: TG_TOKEN
               valueFrom:
