@@ -430,6 +430,7 @@ helm install --values elastic-stack/values.elasticsearch.yaml elasticsearch elas
 helm install kibana elastic/kibana
 helm install --values elastic-stack/values.fluent.yaml fluentd fluent/fluentd
 helm install cockroachdb cockroachdb/cockroachdb
+ENABLE_FLUENT=1 TG_TOKEN=YOUR_TELEGRAM_BOT_TOKEN ./gen-values.sh
 helm install --values tgbot-values.yaml tgbot ./tgbot
 kubectl port-forward kibana-kibana-696f869668-fbcgk 5601 --address 0.0.0.0
 ```
