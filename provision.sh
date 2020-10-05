@@ -1,8 +1,9 @@
-sudo apt-get update && sudo apt-get install curl
+sudo apt-get update
+sudo apt-get install -y curl
 
 # Add zsh
 echo "Installing zsh..."
-sudo apt-get update && sudo apt-get install zsh -y
+sudo apt-get install -y zsh
 sudo chsh -s /bin/zsh vagrant
 
 # Oh My Zsh
@@ -12,10 +13,9 @@ sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.
 sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="agnoster"/g' ~/.zshrc
 
 echo "Installing Docker..."
-sudo apt-get update
 sudo apt-get remove docker docker-engine docker.io
 echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
-sudo apt-get install apt-transport-https ca-certificates software-properties-common -y
+sudo apt-get install -y apt-transport-https ca-certificates software-properties-common
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 sudo apt-key fingerprint 0EBFCD88
 sudo add-apt-repository \
@@ -66,7 +66,7 @@ rm cni-plugins.tgz
 
 echo "Installing Helm, Minikube and kubectl..."
 grep -E --color 'vmx|svm' /proc/cpuinfo
-sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+sudo apt-get install -y apt-transport-https gnupg2
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update

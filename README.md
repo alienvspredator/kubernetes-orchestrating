@@ -422,14 +422,14 @@ This example shows how to create a Kubernetes cluster.
 ### Setup
 
 ```sh
-cd ~/data/elastic-stack
-helm install --values values.yaml elasticsearch elastic/elasticsearch
+cd ~/data
+helm repo add fluent https://fluent.github.io/helm-charts
+helm repo add elastic https://helm.elastic.co
+helm repo add cockroachdb https://charts.cockroachdb.com/
+helm install --values elastic-stack/values.elasticsearch.yaml elasticsearch elastic/elasticsearch
 helm install kibana elastic/kibana
-kubectl create -f fluentd-daemonset-elasticsearch.yaml
-```
-
-### Delete
-
-```sh
-kubectl delete daemonsets.apps -n kube-system fluentd
+helm install --values elastic-stack/values.fluent.yaml fluentd fluent/fluentd
+helm install cockroachdb cockroachdb/cockroachdb
+helm install --values tgbot-values.yaml tgbot ./tgbot
+kubectl port-forward kibana-kibana-696f869668-fbcgk 5601 --address 0.0.0.0
 ```

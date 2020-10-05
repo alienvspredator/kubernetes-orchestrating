@@ -2,6 +2,13 @@
 # Permit co-located instances for solitary minikube virtual machines.
 antiAffinity: soft
 
+# Shrink default JVM heap.
+esJavaOpts: '-Xmx128m -Xms128m'
+
+podSecurityContext:
+  fsGroup: null
+  runAsUser: null
+
 # Allocate smaller chunks of memory per pod.
 resources:
   requests:

@@ -67,6 +67,16 @@ spec:
                 secretKeyRef:
                   key: secret_manager
                   name: {{ .Release.Name }}-auth
+            - name: FLUENT_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: fluent_host
+                  name: {{ .Release.Name }}-auth
+            - name: FLUENT_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: fluent_port
+                  name: {{ .Release.Name }}-auth
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

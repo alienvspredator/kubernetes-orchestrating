@@ -10,7 +10,7 @@ image:
     repository: danyloshevchenko123/tgbot
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-  tag: v1.0.0
+  tag: v1.1.0
 
 imagePullSecrets: []
 nameOverride: ''
@@ -63,7 +63,9 @@ env:
   tg_token: ''
   db_name: defaultdb
   db_user: root
-  db_host: localhost
+  db_host: cockroach
   db_port: '26257'
   db_sslmode: disable
   secret_manager: IN_MEMORY
+  fluent_host: fluentd
+  fluent_port: '24224'
